@@ -1,1 +1,9 @@
-This file was created by IntelliJ IDEA 12.1.6 for binding GitHub repository
+This is intended as a collection of small use cases exemplifying typical algo problems,
+which I'm interested to solve using Java 8, to develop intuition about these APIs.
+
+    minK1:
+        Find K smallest elements in unordered "collection"
+    officeParty:
+        Plan most fun BYOB office party. Party is considered most fun if it has most beers
+        to begin with. The trick is, a boss should not show up if his subordinates would,
+        so you must plan who shows up knowing how many beers every person plans to bring.
