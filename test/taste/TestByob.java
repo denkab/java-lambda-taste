@@ -1,7 +1,10 @@
 package taste;
 
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -11,29 +14,38 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 @Test
+@SuppressWarnings("unchecked")
 public class TestByob {
 
-    public void testNoParty() {
-        assertFalse(new BYOB(null).inviteesTraditional().findAny().isPresent(),
+    private Method codePath;
+
+    @BeforeSuite
+    public void setUp() throws NoSuchMethodException {
+        codePath = BYOB.class.getMethod(
+            "inviteesTraditional"/*"inviteesJava8"*/, new Class[]{});
+    }
+
+    public void testNoParty() throws InvocationTargetException, IllegalAccessException {
+        assertFalse(((Stream<BYOB.Node>) codePath.invoke(new BYOB(null))).findAny().isPresent(),
             "No party should mean no invitees");
     }
 
-    public void testPartyAlone() {
+    public void testPartyAlone() throws InvocationTargetException, IllegalAccessException {
         BYOB.Node self = new BYOB.Node(1L, 6, null);
 
-        Optional<BYOB.Node> firstResult = new BYOB(self).inviteesTraditional().findFirst();
+        Optional<BYOB.Node> firstResult = ((Stream<BYOB.Node>) codePath.invoke(new BYOB(self))).findFirst();
         assertTrue(firstResult.isPresent(), "There should be at least one");
         assertEquals(firstResult.get(), self, "Can only party on your own");
     }
 
-    public void testPartyOfTwo() {
+    public void testPartyOfTwo() throws InvocationTargetException, IllegalAccessException {
         BYOB.Node self = new BYOB.Node(1L, 6, null);
         BYOB.Node assistant = new BYOB.Node(2L, 2, null);
         self.addSubordinate(assistant);
 
-        Stream<BYOB.Node> result = new BYOB(self).inviteesTraditional();
+        Stream<BYOB.Node> result = (Stream<BYOB.Node>) codePath.invoke(new BYOB(self));
         assertEquals(result.count(), 1, "Should be a party of one");
-        Optional<BYOB.Node> firstResult = new BYOB(self).inviteesTraditional().findFirst();
+        Optional<BYOB.Node> firstResult = ((Stream<BYOB.Node>) codePath.invoke(new BYOB(self))).findFirst();
         assertEquals(firstResult.get().getEmployeeId(), 1L, "Expected employee partying should be with ID 1");
         assertEquals(firstResult.get(), self, "Better party on your own");
 
@@ -41,14 +53,14 @@ public class TestByob {
         BYOB.Node generousAssistant = new BYOB.Node(2L, 12, null);
         greedySelf.addSubordinate(generousAssistant);
 
-        result = new BYOB(greedySelf).inviteesTraditional();
+        result = (Stream<BYOB.Node>) codePath.invoke(new BYOB(greedySelf));
         assertEquals(result.count(), 1, "Should be a party of one");
-        firstResult = new BYOB(greedySelf).inviteesTraditional().findFirst();
+        firstResult = ((Stream<BYOB.Node>) codePath.invoke(new BYOB(greedySelf))).findFirst();
         assertEquals(firstResult.get().getEmployeeId(), 2L, "Expected employee partying should be with ID 2");
         assertEquals(firstResult.get(), generousAssistant, "Better party on her own");
     }
 
-    public void testSkipTwoLevels() {
+    public void testSkipTwoLevels() throws InvocationTargetException, IllegalAccessException {
         BYOB.Node ceo = new BYOB.Node(1L, 6, null);
         BYOB.Node svp = new BYOB.Node(2L, 2, null);
         ceo.addSubordinate(svp);
@@ -57,7 +69,7 @@ public class TestByob {
         BYOB.Node manager = new BYOB.Node(4L, 5, null);
         director.addSubordinate(manager);
 
-        Stream<BYOB.Node> result = new BYOB(ceo).inviteesTraditional();
+        Stream<BYOB.Node> result = (Stream<BYOB.Node>) codePath.invoke(new BYOB(ceo));
         assertEquals(result.count(), 2, "Should be a party of two");
     }
 
@@ -69,7 +81,7 @@ public class TestByob {
      *
      * Mgr     1   2   3            2   3
      */
-    public void testBranchedOut() {
+    public void testBranchedOut() throws InvocationTargetException, IllegalAccessException {
         long id = 1;
         BYOB.Node ceo = new BYOB.Node(id++, 6, null);
 
@@ -94,7 +106,7 @@ public class TestByob {
         svp.addSubordinate(director);
         ceo.addSubordinate(svp);
 
-        assertEquals(new BYOB(ceo).inviteesTraditional()
+        assertEquals(((Stream<BYOB.Node>) codePath.invoke(new BYOB(ceo)))
                 .collect(Collectors.summarizingInt(BYOB.Node::getBeers)).getSum(), 17,
             "The most fun party here will have 17 beers");
     }

@@ -55,7 +55,10 @@ public class BYOB {
     }
 
     public Stream<Node> inviteesJava8() {
-        return null;
+        return Stream.of(company).map(this::beersFromSubgraph).flatMap(resultProto ->
+            (resultProto.myBeers > resultProto.beersOfSubNetwork
+                ? resultProto.inviteesWithManager : resultProto.inviteesWithoutManager)
+            .parallelStream());
     }
 
     public static class Node {
