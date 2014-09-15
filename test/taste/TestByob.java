@@ -22,7 +22,7 @@ public class TestByob {
     @BeforeSuite
     public void setUp() throws NoSuchMethodException {
         codePath = BYOB.class.getMethod(
-            "inviteesTraditional"/*"inviteesJava8"*/, new Class[]{});
+            "inviteesJava8"/*"inviteesTraditional"*/, new Class[]{});
     }
 
     public void testNoParty() throws InvocationTargetException, IllegalAccessException {

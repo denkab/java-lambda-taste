@@ -18,6 +18,7 @@ public class BYOB {
         this.company = root;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public Stream<Node> inviteesTraditional() {
         if (company == null) {
             return StreamSupport.stream(Spliterators.emptySpliterator(), false);
@@ -54,11 +55,15 @@ public class BYOB {
         return aggregate;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public Stream<Node> inviteesJava8() {
-        return Stream.of(company).map(this::beersFromSubgraph).flatMap(resultProto ->
-            (resultProto.myBeers > resultProto.beersOfSubNetwork
-                ? resultProto.inviteesWithManager : resultProto.inviteesWithoutManager)
-            .parallelStream());
+        return company == null
+            ? Stream.empty()
+            : Stream.of(company).map(this::beersFromSubgraph).flatMap(
+                resultProto -> (resultProto.myBeers > resultProto.beersOfSubNetwork
+                    ? resultProto.inviteesWithManager
+                    : resultProto.inviteesWithoutManager)
+                .parallelStream());
     }
 
     public static class Node {
